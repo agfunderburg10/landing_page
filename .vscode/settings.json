@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "**/dst/*": "html",
+        "**/dst/errors/*": "html"
+    },
+    "liveServer.settings.root": "/dst"
+}
