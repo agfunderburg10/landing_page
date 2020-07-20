@@ -2,18 +2,17 @@
 git tag -a <tag name> -m "<Information about the tag here>"
 
 // Run this CLI command
-aws s3 sync ./dst s3://template-site-stack-s3bucket-1i9vokd8pnmcn --delete --profile personal --content-type text/html --exclude "*resources/*"
+aws s3 sync ./dst s3://personal-site-stack-s3bucket-1iylqhzp1uxog --delete --profile personal --content-type text/html --exclude "*resources/*"
 // Deploy resources separately to maintain their file extensions
-aws s3 sync ./dst/resources s3://template-site-stack-s3bucket-1i9vokd8pnmcn/resources --delete --profile personal
+aws s3 sync ./dst/resources s3://personal-site-stack-s3bucket-1iylqhzp1uxog/resources --delete --profile personal
 
 
 // validate stack template
 aws cloudformation validate-template --template-body file://s3.website.cfn.yaml --profile personal
 
 // create or update cloudformation stack
-aws cloudformation deploy --template-file s3.website.cfn.yaml --stack-name template-site-stack --profile personal^
+aws cloudformation deploy --template-file s3.website.cfn.yaml --stack-name personal-site-stack --profile personal^
  --parameter-overrides^
  DefaultRootObject=index.html^
- Domain=template.afunderburg.com^
  HostedZoneID=Z185AO3XBOR7UW^
  ErrorPagePath=/errors/404
