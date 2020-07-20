@@ -14,6 +14,14 @@
     </a>
 </body>
 <footer>
-    <script src='resources/main.js'></script>
+    <script>
+        document.querySelector('#changeColor').onclick = function() {
+            if (this.style.color == "green") {
+                this.style.color = "blue";
+            } else {
+                this.style.color = "green";
+            }
+        }
+    </script>
 </footer>
 </html>
