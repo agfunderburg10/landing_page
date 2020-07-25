@@ -3,4 +3,5 @@ aws cloudformation deploy --template-file s3.website.cfn.yaml --stack-name perso
  --parameter-overrides^
  DefaultRootObject=index.html^
  HostedZoneID=Z185AO3XBOR7UW^
- ErrorPagePath=/errors/404
+ ErrorPagePath=/errors/404^
+ --capabilities CAPABILITY_NAMED_IAM

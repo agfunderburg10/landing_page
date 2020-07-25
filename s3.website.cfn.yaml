@@ -106,3 +106,31 @@ Resources:
       AliasTarget:
         HostedZoneId: Z2FDTNDATAQYW2 # This Zone ID is used for any CloudFront Distribution
         DNSName: !GetAtt "CloudFrontDistribution.DomainName"
+
+  DeploymentIamManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:*
+            Resource:
+              - !GetAtt S3Bucket.Arn
+              - !Sub 
+                - ${bucketArn}/*
+                - { bucketArn: !GetAtt S3Bucket.Arn }
+          
+          - Effect: Deny
+            Action:
+              - s3:DeleteBucket*
+            Resource:
+              - !GetAtt S3Bucket.Arn
+
+  DeploymentIamUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: landing-page-deployer
+      ManagedPolicyArns:
+        - !Ref DeploymentIamManagedPolicy
