@@ -1,4 +1,5 @@
 on:
+  workflow_dispatch: {}
   push:
     paths:
       - 'dst/**'
@@ -7,51 +8,59 @@ on:
 
 name: Deploy Site to AWS S3
 
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+env:
+  DEPLOY_REGION: us-east-2
+
 jobs:
   deploy:
-    name: Deploy
+    name: deploy
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+    - name: checkout
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      # takes 180 seconds to timeout if role doesn't exist... no need to wait that long
+      timeout-minutes: 1
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+        aws-region: ${{ env.DEPLOY_REGION }}
+        role-to-assume: arn:aws:iam::812212307632:role/github-actions/${{ github.repository }}
 
-    - name: Get changed html files
+    - name: get changed html files
       id: changed-html-files
-      uses: tj-actions/changed-files@v14.1
+      uses: tj-actions/changed-files@v37
       with:
         files: |
           dst/*.html
 
-    - name: Get changed resource files
+    - name: get changed resource files
       id: changed-resource-files
-      uses: tj-actions/changed-files@v14.1
+      uses: tj-actions/changed-files@v37
       with:
         files: |
           dst/resources/**
 
-    - name: Sync HTML Files to S3
+    - name: sync html files to s3
       id: sync-html-files
       if: steps.changed-html-files.outputs.any_modified == 'true'
       run: |
         aws s3 sync ./dst s3://personal-site-stack-s3bucket-1iylqhzp1uxog --delete --content-type text/html --exclude "*resources/*"
 
-    - name: Sync Resource Files to S3
+    - name: sync resource files to s3
       id: sync-resource-files
       if: steps.changed-resource-files.outputs.any_modified == 'true'
       run: |
         aws s3 sync ./dst/resources s3://personal-site-stack-s3bucket-1iylqhzp1uxog/resources --delete
 
-    - name: Create Cloudfront Invalidation
+    - name: create cloudfront invalidation
       id: create-cloudfront-invalidation
       run: |
         aws cloudfront create-invalidation --distribution-id E5SXQO12UNUV2 --paths "/*" 
