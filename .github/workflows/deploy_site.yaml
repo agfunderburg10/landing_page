@@ -27,7 +27,7 @@ jobs:
         fetch-depth: 0
 
     - name: configure aws credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       # takes 180 seconds to timeout if role doesn't exist... no need to wait that long
       timeout-minutes: 1
       with:
