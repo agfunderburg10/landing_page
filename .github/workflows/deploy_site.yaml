@@ -51,7 +51,7 @@ jobs:
 
     - name: sync html files to s3
       id: sync-html-files
-      if: steps.changed-html-files.outputs.any_modified == 'true'
+      # if: steps.changed-html-files.outputs.any_modified == 'true'
       run: |
         aws s3 sync ./dst s3://personal-site-stack-s3bucket-1iylqhzp1uxog --delete --content-type text/html --exclude "*resources/*"
 
